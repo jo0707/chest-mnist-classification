@@ -6,18 +6,19 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import OneCycleLR
 from datareader import get_data_loaders
 from model import SimpleCNN
+from modelresnet18 import ResNet18Model
 
 # --- Konfigurasi Training ---
-EPOCHS = 32
-BATCH_SIZE = 16
-LEARNING_RATE = 0.0001
+EPOCHS = 64
+BATCH_SIZE = 32
+LEARNING_RATE = 0.001
 
 def train():
     # 1. Memuat Data
     train_loader, val_loader, num_classes, in_channels = get_data_loaders(BATCH_SIZE)
     
     # 2. Inisialisasi Model
-    model = SimpleCNN(in_channels=in_channels, num_classes=num_classes)
+    model = ResNet18Model(in_channels=in_channels, num_classes=num_classes)
     
     # 3. Mendefinisikan Loss Function dan Optimizer
     # Gunakan BCEWithLogitsLoss untuk klasifikasi biner. Ini lebih stabil secara numerik.
@@ -25,8 +26,8 @@ def train():
     optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
     
     # Learning Rate Scheduler - OneCycleLR untuk pelatihan yang lebih efektif
-    scheduler = OneCycleLR(optimizer, 
-                          max_lr=LEARNING_RATE * 10,  # Maksimum LR 10x dari base LR
+    scheduler = OneCycleLR(optimizer,
+                          max_lr=LEARNING_RATE,
                           steps_per_epoch=len(train_loader),
                           epochs=EPOCHS,
                           pct_start=0.3)  # 30% pertama untuk warm-up

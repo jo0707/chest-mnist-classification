@@ -1,18 +1,18 @@
 # datareader.py
 """
 datareader.py
-Module for loading and preprocessing the ChestMNIST dataset for binary classification between Pneumonia and Edema.
+Module for loading and preprocessing the ChestMNIST dataset for binary classification between Cardiomegaly and Pneumothorax.
 Classes:
     FilteredBinaryDataset(Dataset):
-        A PyTorch Dataset that filters the ChestMNIST dataset to only include samples with a single label of either Pneumonia or Edema, and remaps their labels to 0 (Pneumonia) and 1 (Edema).
+        A PyTorch Dataset that filters the ChestMNIST dataset to only include samples with a single label of either Cardiomegaly or Pneumothorax, and remaps their labels to 0 (Cardiomegaly) and 1 (Pneumothorax).
 Functions:
     get_data_loaders(batch_size):
         Returns PyTorch DataLoaders for the filtered binary dataset with data augmentation applied to the training set.
     show_samples(dataset):
-        Visualizes 5 sample images from each class (Pneumonia and Edema) in the provided dataset.
+        Visualizes 5 sample images from each class (Cardiomegaly and Pneumothorax) in the provided dataset.
 Constants:
-    CLASS_A_IDX (int): Index for 'pneumonia' class in ChestMNIST labels (6).
-    CLASS_B_IDX (int): Index for 'edema' class in ChestMNIST labels (11).
+    CLASS_A_IDX (int): Index for 'Cardiomegaly' class in ChestMNIST labels (1).
+    CLASS_B_IDX (int): Index for 'Pneumothorax' class in ChestMNIST labels (13).
     NEW_CLASS_NAMES (dict): Mapping of new class indices to class names.
 ChestMNIST Class Index Reference:
     # 0: 'Atelectasis'
@@ -42,10 +42,10 @@ from medmnist import ChestMNIST
 
 
 # --- Konfigurasi Kelas Biner ---
-CLASS_A_IDX = 9  # 'mass'
-CLASS_B_IDX = 10 # 'nodule'
+CLASS_A_IDX = 1  # 'Cardiomegaly'
+CLASS_B_IDX = 13 # 'Pneumothorax'
 
-NEW_CLASS_NAMES = {0: 'Pneumonia', 1: 'Edema'}
+NEW_CLASS_NAMES = {0: 'Cardiomegaly', 1: 'Pneumothorax'}
 
 class FilteredBinaryDataset(Dataset):
     def __init__(self, split, transform=None):
@@ -63,12 +63,12 @@ class FilteredBinaryDataset(Dataset):
         self.images = []
         self.labels = []
 
-        # Tambahkan data untuk kelas Pneumonia (dipetakan ke label 0)
+        # Tambahkan data untuk kelas Cardiomegaly (dipetakan ke label 0)
         for idx in indices_a:
             self.images.append(full_dataset[idx][0])
             self.labels.append(0)
 
-        # Tambahkan data untuk kelas Fibrosis (dipetakan ke label 1)
+        # Tambahkan data untuk kelas Pneumothorax (dipetakan ke label 1)
         for idx in indices_b:
             self.images.append(full_dataset[idx][0])
             self.labels.append(1)
@@ -120,31 +120,31 @@ def get_data_loaders(batch_size):
     return train_loader, val_loader, n_classes, n_channels
 
 def show_samples(dataset):
-    pneumonia_imgs = []
-    fibrosis_imgs = []
+    cardiomegaly_imgs = []
+    pneumothorax_imgs = []
     
     for img, label in dataset:
-        if label.item() == 0 and len(pneumonia_imgs) < 5:
-            pneumonia_imgs.append(img)
-        elif label.item() == 1 and len(fibrosis_imgs) < 5:
-            fibrosis_imgs.append(img)
+        if label.item() == 0 and len(cardiomegaly_imgs) < 5:
+            cardiomegaly_imgs.append(img)
+        elif label.item() == 1 and len(pneumothorax_imgs) < 5:
+            pneumothorax_imgs.append(img)
         
-        if len(pneumonia_imgs) == 5 and len(fibrosis_imgs) == 5:
+        if len(cardiomegaly_imgs) == 5 and len(pneumothorax_imgs) == 5:
             break
             
     fig, axes = plt.subplots(2, 5, figsize=(15, 6))
-    fig.suptitle("Perbandingan Gambar: Pneumonia (atas) vs Fibrosis (bawah)", fontsize=16)
+    fig.suptitle("Perbandingan Gambar: Cardiomegaly (atas) vs Pneumothorax (bawah)", fontsize=16)
     
-    for i, img in enumerate(pneumonia_imgs):
+    for i, img in enumerate(cardiomegaly_imgs):
         ax = axes[0, i]
         ax.imshow(img.squeeze(), cmap='gray')
-        ax.set_title(f"Pneumonia #{i+1}")
+        ax.set_title(f"Cardiomegaly #{i+1}")
         ax.axis('off')
         
-    for i, img in enumerate(fibrosis_imgs):
+    for i, img in enumerate(pneumothorax_imgs):
         ax = axes[1, i]
         ax.imshow(img.squeeze(), cmap='gray')
-        ax.set_title(f"Fibrosis #{i+1}")
+        ax.set_title(f"Pneumothorax #{i+1}")
         ax.axis('off')
         
     plt.tight_layout(rect=[0, 0, 1, 0.95])
